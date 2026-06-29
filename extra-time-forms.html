@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Extra Time Forms — Loxford School SEN</title>
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --purple: #4a148c;
+    --purple-mid: #7b1fa2;
+    --purple-light: #e8d5f5;
+    --purple-pale: #f5eeff;
+    --gold: #f9a825;
+    --gold-light: #fff8e1;
+    --paper: #fafaf8;
+    --white: #ffffff;
+    --grey-50: #f8f8f8;
+    --grey-100: #f0f0f0;
+    --grey-200: #e0e0e0;
+    --grey-400: #9e9e9e;
+    --grey-700: #424242;
+    --green: #1b5e20;
+    --green-light: #e8f5e9;
+    --red: #b71c1c;
+    --red-light: #ffebee;
+    --font-main: 'Segoe UI', system-ui, sans-serif;
+    --radius: 6px;
+    --shadow: 0 2px 8px rgba(74,20,140,0.10);
+    --shadow-lg: 0 4px 20px rgba(74,20,140,0.14);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-main); background: var(--paper); color: var(--ink); min-height: 100vh; }
+
+  header {
+    background: var(--purple); color: white; padding: 18px 32px;
+    display: flex; align-items: center; gap: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25); position: sticky; top: 0; z-index: 100;
+  }
+  .logo-block { display: flex; flex-direction: column; }
+  .logo-school { font-size: 18px; font-weight: 700; }
+  .logo-dept { font-size: 12px; opacity: 0.75; letter-spacing: 0.5px; text-transform: uppercase; }
+  .logo-divider { width: 2px; height: 36px; background: rgba(255,255,255,0.3); }
+  .logo-title { font-size: 15px; font-weight: 500; opacity: 0.9; }
+
+  /* CONFIG BANNER */
+  .config-banner {
+    background: var(--gold-light); border-bottom: 2px solid var(--gold);
+    padding: 10px 32px; display: flex; align-items: center; gap: 12px; font-size: 13px;
+  }
+  .config-banner.connected { background: var(--green-light); border-color: #66bb6a; }
+  .config-banner.connected .config-dot { background: #2e7d32; }
+  .config-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+  .config-banner input {
+    flex: 1; max-width: 480px; border: 1.5px solid var(--grey-200); border-radius: 4px;
+    padding: 5px 10px; font-size: 12px; font-family: monospace; background: white;
+  }
+  .config-banner button {
+    background: var(--purple); color: white; border: none; border-radius: 4px;
+    padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+  }
+  .config-banner span { color: var(--grey-700); }
+  .config-banner strong { color: var(--green); }
+
+  .tab-bar { background: var(--purple-mid); display: flex; gap: 4px; padding: 0 32px; }
+  .tab-btn {
+    padding: 12px 24px; border: none; background: transparent;
+    color: rgba(255,255,255,0.65); font-size: 13px; font-weight: 600;
+    cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.15s;
+    text-transform: uppercase; letter-spacing: 0.6px;
+  }
+  .tab-btn:hover { color: white; }
+  .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  .main { max-width: 860px; margin: 0 auto; padding: 32px 24px 80px; }
+  .form-panel { display: none; }
+  .form-panel.active { display: block; }
+
+  .form-intro {
+    background: var(--purple-pale); border-left: 4px solid var(--purple);
+    border-radius: 0 var(--radius) var(--radius) 0; padding: 16px 20px; margin-bottom: 28px;
+  }
+  .form-intro h1 { font-size: 22px; color: var(--purple); margin-bottom: 4px; }
+  .form-intro p { font-size: 14px; color: var(--grey-700); line-height: 1.5; }
+
+  .section { margin-bottom: 24px; background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .section-header { background: var(--purple); color: white; padding: 10px 18px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+  .section-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 13px; font-weight: 600; color: var(--grey-700); }
+  .field label .req { color: var(--red); margin-left: 2px; }
+  .field input[type=text], .field input[type=date], .field textarea, .field select {
+    border: 1.5px solid var(--grey-200); border-radius: var(--radius);
+    padding: 9px 12px; font-size: 14px; font-family: var(--font-main);
+    background: var(--grey-50); transition: border-color 0.15s, background 0.15s; width: 100%;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    outline: none; border-color: var(--purple-mid); background: white;
+  }
+  .field textarea { resize: vertical; min-height: 80px; }
+
+  .ysn-grid { display: flex; flex-direction: column; gap: 2px; }
+  .ysn-row {
+    display: grid; grid-template-columns: 1fr 100px 110px 80px;
+    align-items: center; gap: 8px; padding: 7px 10px;
+    border-radius: 4px; background: var(--grey-50); border: 1px solid transparent;
+  }
+  .ysn-row:hover { background: var(--purple-pale); }
+  .ysn-label { font-size: 13px; color: var(--ink); }
+  .ysn-btn-group { display: flex; gap: 4px; justify-content: center; }
+  .ysn-btn {
+    border: none; border-radius: 4px; padding: 4px 10px; font-size: 12px; font-weight: 600;
+    cursor: pointer; background: var(--grey-200); color: var(--grey-700); transition: all 0.12s; white-space: nowrap;
+  }
+  .ysn-btn.selected-yes { background: var(--green-light); color: var(--green); border: 1.5px solid #a5d6a7; }
+  .ysn-btn.selected-sometimes { background: #fff3e0; color: #e65100; border: 1.5px solid #ffcc80; }
+  .ysn-btn.selected-no { background: var(--red-light); color: var(--red); border: 1.5px solid #ef9a9a; }
+  .ysn-header { display: grid; grid-template-columns: 1fr 100px 110px 80px; gap: 8px; padding: 4px 10px; margin-bottom: 2px; }
+  .ysn-header span { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--grey-400); text-align: center; }
+  .ysn-header span:first-child { text-align: left; }
+
+  .check-group { display: flex; flex-direction: column; gap: 6px; }
+  .check-opt {
+    display: flex; align-items: center; gap: 10px; padding: 7px 12px;
+    border-radius: 4px; cursor: pointer; background: var(--grey-50);
+    border: 1.5px solid var(--grey-200); transition: all 0.12s; user-select: none;
+  }
+  .check-opt:hover { background: var(--purple-pale); border-color: var(--purple-light); }
+  .check-opt input { accent-color: var(--purple); width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; }
+  .check-opt span { font-size: 13px; }
+
+  .radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .radio-opt {
+    display: flex; align-items: center; gap: 8px; padding: 7px 14px;
+    border-radius: 4px; cursor: pointer; background: var(--grey-50);
+    border: 1.5px solid var(--grey-200); transition: all 0.12s; user-select: none;
+  }
+  .radio-opt:hover { background: var(--purple-pale); border-color: var(--purple-light); }
+  .radio-opt.selected-yes { background: var(--green-light); border-color: #a5d6a7; }
+  .radio-opt.selected-no { background: var(--red-light); border-color: #ef9a9a; }
+  .radio-opt input { accent-color: var(--purple); cursor: pointer; }
+  .radio-opt span { font-size: 14px; font-weight: 500; }
+
+  .submit-area { margin-top: 28px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+  .submit-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .btn-submit {
+    background: var(--purple); color: white; border: none; border-radius: var(--radius);
+    padding: 13px 28px; font-size: 15px; font-weight: 600; cursor: pointer;
+    box-shadow: var(--shadow); transition: background 0.15s, transform 0.1s;
+  }
+  .btn-submit:hover { background: var(--purple-mid); transform: translateY(-1px); }
+  .btn-submit:disabled { background: var(--grey-400); cursor: not-allowed; transform: none; }
+  .btn-secondary {
+    background: white; color: var(--purple); border: 2px solid var(--purple);
+    border-radius: var(--radius); padding: 11px 22px; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .btn-secondary:hover { background: var(--purple-pale); }
+
+  .submit-status { font-size: 13px; padding: 8px 14px; border-radius: 4px; display: none; }
+  .submit-status.sending { display: block; background: var(--gold-light); color: #5d4037; border: 1px solid var(--gold); }
+  .submit-status.success { display: block; background: var(--green-light); color: var(--green); border: 1px solid #a5d6a7; }
+  .submit-status.error { display: block; background: var(--red-light); color: var(--red); border: 1px solid #ef9a9a; }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(26,26,46,0.55); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: white; border-radius: 10px; box-shadow: var(--shadow-lg); max-width: 780px; width: 100%; max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; }
+  .modal-header { background: var(--purple); color: white; padding: 16px 22px; display: flex; align-items: center; justify-content: space-between; }
+  .modal-header h2 { font-size: 16px; font-weight: 700; }
+  .modal-close { background: rgba(255,255,255,0.15); border: none; color: white; font-size: 20px; cursor: pointer; border-radius: 4px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; }
+  .modal-body { flex: 1; overflow-y: auto; padding: 22px; }
+  .modal-footer { padding: 14px 22px; border-top: 1px solid var(--grey-200); display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .preview-card { border: 1px solid var(--grey-200); border-radius: var(--radius); overflow: hidden; font-size: 13px; }
+  .preview-block { padding: 10px 14px; border-bottom: 1px solid var(--grey-100); }
+  .preview-block:last-child { border-bottom: none; }
+  .preview-block.section-head { background: var(--purple-pale); font-weight: 700; color: var(--purple); font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; }
+  .preview-row { display: grid; grid-template-columns: 200px 1fr; gap: 10px; margin-bottom: 4px; }
+  .preview-row:last-child { margin-bottom: 0; }
+  .preview-key { color: var(--grey-400); font-weight: 600; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .badge-yes { background: var(--green-light); color: var(--green); }
+  .badge-sometimes { background: #fff3e0; color: #e65100; }
+  .badge-no { background: var(--red-light); color: var(--red); }
+  .alert-success { background: var(--green-light); border: 1.5px solid #a5d6a7; border-radius: var(--radius); padding: 12px 16px; color: var(--green); font-size: 14px; font-weight: 500; margin-bottom: 16px; }
+
+  /* SUBMISSIONS */
+  .submissions-panel { background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 24px; }
+  .submissions-panel h2 { font-size: 16px; color: var(--purple); margin-bottom: 14px; border-bottom: 2px solid var(--purple-light); padding-bottom: 8px; }
+  .sub-list { display: flex; flex-direction: column; gap: 8px; }
+  .sub-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 4px; background: var(--grey-50); border: 1px solid var(--grey-200); font-size: 13px; }
+  .sub-item strong { color: var(--purple); }
+  .sub-item .sub-meta { color: var(--grey-400); font-size: 12px; margin-left: auto; }
+  .btn-view-sub { background: var(--purple-pale); color: var(--purple); border: 1px solid var(--purple-light); border-radius: 4px; padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .empty-state { color: var(--grey-400); font-size: 13px; font-style: italic; padding: 10px 0; }
+
+  .sheet-link-box { background: var(--green-light); border: 1.5px solid #a5d6a7; border-radius: var(--radius); padding: 14px 18px; margin-bottom: 20px; font-size: 13px; color: var(--green); display: none; }
+  .sheet-link-box.visible { display: block; }
+  .sheet-link-box a { color: var(--green); font-weight: 700; }
+
+  @media (max-width: 600px) {
+    .main { padding: 20px 14px 60px; }
+    .ysn-row { grid-template-columns: 1fr; }
+    .ysn-header { display: none; }
+    header { padding: 14px 16px; }
+    .tab-btn { padding: 10px 14px; font-size: 11px; }
+    .config-banner { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-block">
+    <span class="logo-school">Loxford School</span>
+    <span class="logo-dept">SEN Department</span>
+  </div>
+  <div class="logo-divider"></div>
+  <span class="logo-title">Extra Time Evidence Collection</span>
+</header>
+
+<!-- CONFIG BANNER -->
+<div class="config-banner" id="config-banner">
+  <div class="config-dot" id="config-dot"></div>
+  <span id="config-label">Google Sheets not connected — paste your Apps Script URL:</span>
+  <input type="text" id="script-url-input" placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec">
+  <button onclick="saveScriptUrl()">Connect</button>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('nwow', this)">Form A — Normal Way of Working</button>
+  <button class="tab-btn" onclick="switchTab('mock', this)">Form B — Mock Cover Sheet</button>
+  <button class="tab-btn" onclick="switchTab('submissions', this)">Submissions</button>
+</div>
+
+<div class="main">
+
+  <!-- ═══ FORM A ═══ -->
+  <div id="panel-nwow" class="form-panel active">
+    <div class="form-intro">
+      <h1>Normal Way of Working — Teacher Checklist</h1>
+      <p>Complete this form for any student being considered for 25% extra time. Your responses are sent directly to the SEN team's Google Sheet — no email needed. Please complete all sections honestly based on what you observe in your lessons.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-header">Student &amp; Staff Details</div>
+      <div class="section-body">
+        <div class="field">
+          <label>Student full name <span class="req">*</span></label>
+          <input type="text" id="a-student-name" placeholder="First and last name">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="field">
+            <label>Year group <span class="req">*</span></label>
+            <select id="a-year-group">
+              <option value="">— select —</option>
+              <option>Year 9</option><option>Year 10</option><option>Year 11</option>
+              <option>Year 12</option><option>Year 13</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Date <span class="req">*</span></label>
+            <input type="date" id="a-date">
+          </div>
+        </div>
+        <div class="field">
+          <label>Your name <span class="req">*</span></label>
+          <input type="text" id="a-teacher-name" placeholder="Your full name">
+        </div>
+        <div class="field">
+          <label>Subject / course <span class="req">*</span></label>
+          <input type="text" id="a-subject" placeholder="e.g. GCSE Media Studies">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">Difficulties Observed</div>
+      <div class="section-body">
+        <div class="field">
+          <label>Please name at least one area where this student struggles in class <span class="req">*</span></label>
+          <textarea id="a-struggles" placeholder="Describe the specific difficulties you have observed..."></textarea>
+        </div>
+        <div class="field">
+          <label>Please give two ways you are helping this student in class or outside the classroom <span class="req">*</span></label>
+          <textarea id="a-support" placeholder="e.g. Repeating instructions in step-by-step format, frequent check-ins..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">Time</div>
+      <div class="section-body">
+        <div class="ysn-header"><span>Observation</span><span>Yes</span><span>Sometimes</span><span>No</span></div>
+        <div class="ysn-grid" id="grid-time"></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-header">Reading</div>
+      <div class="section-body">
+        <div class="ysn-header"><span>Observation</span><span>Yes</span><span>Sometimes</span><span>No</span></div>
+        <div class="ysn-grid" id="grid-reading"></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-header">Written Work</div>
+      <div class="section-body">
+        <div class="ysn-header"><span>Observation</span><span>Yes</span><span>Sometimes</span><span>No</span></div>
+        <div class="ysn-grid" id="grid-written"></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-header">Memory &amp; Concentration</div>
+      <div class="section-body">
+        <div class="ysn-header"><span>Observation</span><span>Yes</span><span>Sometimes</span><span>No</span></div>
+        <div class="ysn-grid" id="grid-memory"></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-header">Practical Tasks</div>
+      <div class="section-body">
+        <div class="ysn-header"><span>Observation</span><span>Yes</span><span>Sometimes</span><span>No</span></div>
+        <div class="ysn-grid" id="grid-practical"></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-header">Organisation</div>
+      <div class="section-body">
+        <div class="ysn-header"><span>Observation</span><span>Yes</span><span>Sometimes</span><span>No</span></div>
+        <div class="ysn-grid" id="grid-organisation"></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-header">Vision</div>
+      <div class="section-body">
+        <div class="ysn-header"><span>Observation</span><span>Yes</span><span>Sometimes</span><span>No</span></div>
+        <div class="ysn-grid" id="grid-vision"></div>
+        <div class="field">
+          <label>If coloured overlay used — please state the colour</label>
+          <input type="text" id="a-overlay-colour" placeholder="e.g. yellow, blue — leave blank if N/A">
+        </div>
+        <div class="field">
+          <label>If coloured paper used — please state the colour</label>
+          <input type="text" id="a-paper-colour" placeholder="e.g. cream — leave blank if N/A">
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-header">Exams</div>
+      <div class="section-body">
+        <div class="ysn-header"><span>Observation</span><span>Yes</span><span>Sometimes</span><span>No</span></div>
+        <div class="ysn-grid" id="grid-exams"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">Your Professional Observations</div>
+      <div class="section-body">
+        <div class="field">
+          <label>Please provide observations relevant to your subject as to why this candidate needs 25% extra time <span class="req">*</span></label>
+          <textarea id="a-why-extra-time" rows="5" placeholder="Your detailed professional observation — this is the most important part of this form..."></textarea>
+        </div>
+        <div class="field">
+          <label>What adjustments are made in lessons, tests or exams? <span class="req">*</span></label>
+          <textarea id="a-adjustments" placeholder="e.g. Computer access, scribe, step-by-step instructions on board..."></textarea>
+        </div>
+        <div class="field">
+          <label>Please comment on how the student is using the 25% extra time <span class="req">*</span></label>
+          <textarea id="a-usage-comment" placeholder="e.g. Student uses the time to complete answers more fully, or re-check work..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-area">
+      <div class="submit-row">
+        <button class="btn-submit" id="btn-submit-a" onclick="submitFormA()">Submit to Google Sheet</button>
+        <button class="btn-secondary" onclick="clearFormA()">Clear form</button>
+      </div>
+      <div class="submit-status" id="status-a"></div>
+    </div>
+  </div>
+
+  <!-- ═══ FORM B ═══ -->
+  <div id="panel-mock" class="form-panel">
+    <div class="form-intro">
+      <h1>Mock Extra Time Evidence — Post-Exam Cover Sheet</h1>
+      <p>Complete this form after any mock or internal assessment for a student with 25% extra time. Your response goes directly to the SEN team — one form per student per exam.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-header">Exam Details</div>
+      <div class="section-body">
+        <div class="field">
+          <label>Student full name <span class="req">*</span></label>
+          <input type="text" id="b-student-name" placeholder="First and last name">
+        </div>
+        <div class="field">
+          <label>Subject <span class="req">*</span></label>
+          <input type="text" id="b-subject" placeholder="e.g. GCSE Media Studies">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="field">
+            <label>Date of exam <span class="req">*</span></label>
+            <input type="date" id="b-exam-date">
+          </div>
+          <div class="field">
+            <label>Your name <span class="req">*</span></label>
+            <input type="text" id="b-teacher-name" placeholder="Your full name">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">Extra Time Use</div>
+      <div class="section-body">
+        <div class="field">
+          <label>Did the student use their 25% extra time? <span class="req">*</span></label>
+          <div class="radio-group" id="b-used-time-group">
+            <label class="radio-opt" onclick="selectRadio('b-used-time','Yes',this)">
+              <input type="radio" name="b-used-time" value="Yes"> <span>✓ Yes — student used extra time</span>
+            </label>
+            <label class="radio-opt" onclick="selectRadio('b-used-time','No',this)">
+              <input type="radio" name="b-used-time" value="No"> <span>✗ Student did not use extra time</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">Impact of Extra Time</div>
+      <div class="section-body">
+        <div class="field">
+          <label>What was the impact of the extra time? <em style="font-weight:400;color:var(--grey-400)">(tick all that apply)</em></label>
+          <div class="check-group">
+            <label class="check-opt"><input type="checkbox" id="b-impact-1"> <span>Student completed more questions / sections</span></label>
+            <label class="check-opt"><input type="checkbox" id="b-impact-2"> <span>Student improved or extended their answers</span></label>
+            <label class="check-opt"><input type="checkbox" id="b-impact-3"> <span>Student reviewed and corrected their answers</span></label>
+            <label class="check-opt"><input type="checkbox" id="b-impact-other"> <span>Other — please describe below</span></label>
+          </div>
+        </div>
+        <div class="field" id="b-impact-other-field" style="display:none">
+          <label>Please describe the impact</label>
+          <input type="text" id="b-impact-other-text" placeholder="Describe what the student did with the extra time...">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">Teacher Comment</div>
+      <div class="section-body">
+        <div class="field">
+          <label>Teacher comment <span class="req">*</span></label>
+          <textarea id="b-teacher-comment" rows="5" placeholder="Your professional observation about whether extra time appears to be needed for this student in this subject and on this paper..."></textarea>
+        </div>
+        <div class="field">
+          <label>Student comment <em style="font-weight:400;color:var(--grey-400)">(optional)</em></label>
+          <textarea id="b-student-comment" rows="3" placeholder="If the student wishes to add anything — leave blank if not applicable..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-area">
+      <div class="submit-row">
+        <button class="btn-submit" id="btn-submit-b" onclick="submitFormB()">Submit to Google Sheet</button>
+        <button class="btn-secondary" onclick="clearFormB()">Clear form</button>
+      </div>
+      <div class="submit-status" id="status-b"></div>
+    </div>
+  </div>
+
+  <!-- ═══ SUBMISSIONS ═══ -->
+  <div id="panel-submissions" class="form-panel">
+    <div class="form-intro">
+      <h1>Session Submissions</h1>
+      <p>Submissions made in this browser session are listed below. All submissions are also written to the connected Google Sheet in real time — this is just a local log for your reference.</p>
+    </div>
+
+    <div class="sheet-link-box" id="sheet-link-box">
+      ✓ Connected to Google Sheet — <a href="#" id="sheet-link" target="_blank">open the sheet</a> to see all submissions from all staff.
+    </div>
+
+    <div class="submissions-panel">
+      <h2>Form A — Normal Way of Working</h2>
+      <div class="sub-list" id="subs-a"><div class="empty-state">No submissions this session.</div></div>
+    </div>
+    <div class="submissions-panel">
+      <h2>Form B — Mock Cover Sheets</h2>
+      <div class="sub-list" id="subs-b"><div class="empty-state">No submissions this session.</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-title">Submission</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn-submit" onclick="window.print()">Print / Save as PDF</button>
+      <button class="btn-secondary" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── SCRIPT URL ──
+// The SENCO pastes the Apps Script web app URL here once and it's saved to localStorage
+let SCRIPT_URL = localStorage.getItem('loxford_sen_script_url') || '';
+let SHEET_URL  = localStorage.getItem('loxford_sen_sheet_url') || '';
+
+function saveScriptUrl() {
+  const val = document.getElementById('script-url-input').value.trim();
+  if (!val.startsWith('https://script.google.com')) {
+    alert('That doesn\'t look like a valid Apps Script URL. It should start with https://script.google.com/macros/s/');
+    return;
+  }
+  SCRIPT_URL = val;
+  localStorage.setItem('loxford_sen_script_url', val);
+  updateConfigBanner();
+  // Ping to get sheet URL back
+  fetch(SCRIPT_URL + '?action=getSheetUrl')
+    .then(r => r.json())
+    .then(d => {
+      if (d.sheetUrl) {
+        SHEET_URL = d.sheetUrl;
+        localStorage.setItem('loxford_sen_sheet_url', d.sheetUrl);
+        updateSheetLink();
+      }
+    }).catch(() => {});
+}
+
+function updateConfigBanner() {
+  const banner  = document.getElementById('config-banner');
+  const dot     = document.getElementById('config-dot');
+  const label   = document.getElementById('config-label');
+  const input   = document.getElementById('script-url-input');
+  if (SCRIPT_URL) {
+    banner.classList.add('connected');
+    dot.style.background = '#2e7d32';
+    label.innerHTML = '<strong>✓ Connected to Google Sheets.</strong> Submissions will go directly to the SEN spreadsheet.';
+    input.style.display = 'none';
+    input.nextElementSibling.style.display = 'none'; // hide button
+  } else {
+    input.value = '';
+  }
+}
+
+function updateSheetLink() {
+  if (!SHEET_URL) return;
+  const box  = document.getElementById('sheet-link-box');
+  const link = document.getElementById('sheet-link');
+  box.classList.add('visible');
+  link.href = SHEET_URL;
+}
+
+// ── YSN DATA ──
+const YSN_SECTIONS = {
+  'grid-time': [
+    "Takes longer than expected with work/tasks and/or finishes after others",
+    "Needs extra time for assignments",
+    "Needs time to formulate an answer to a verbal question (slow responding)"
+  ],
+  'grid-reading': [
+    "Needs reading support in class","Avoids reading aloud",
+    "Has difficulty following written instructions",
+    "Has difficulty processing text — needs to re-read for meaning",
+    "Finds it hard to remember what they have read"
+  ],
+  'grid-written': [
+    "Handwriting is difficult to read",
+    "Has difficulty copying from the board with speed and/or accuracy",
+    "Finds taking notes hard","Works on laptop/computer rather than writing",
+    "Needs support with planning written work",
+    "Can explain verbally but struggles to write anything down",
+    "Needs support with spelling","Grammar and punctuation insecure"
+  ],
+  'grid-memory': [
+    "Has difficulty following oral instructions",
+    "Has difficulty concentrating for long periods",
+    "Has difficulty remembering messages, appointments",
+    "Needs to have instructions repeated","Needs to have instructions written down"
+  ],
+  'grid-practical': [
+    "Prefers practical tasks to written ones",
+    "Understands better if able to consolidate learning through practical experience",
+    "Poor at practical tasks","Needs support with physical demands of practical tasks"
+  ],
+  'grid-organisation': [
+    "Organisational skills are weak — loses things, forgets to bring items",
+    "Misses deadlines","Work is often incomplete or lost"
+  ],
+  'grid-vision': [
+    "Needs large print version","Uses a coloured overlay when reading",
+    "Benefits from handouts on coloured paper"
+  ],
+  'grid-exams': [
+    "Difficulty revising for exams / doesn't know how to revise",
+    "Unable to finish an exam in the time allowed",
+    "Panics when faced with tests","Needs to take frequent rest breaks",
+    "Needs reminders to stay focused on task"
+  ]
+};
+
+const ysnState = {};
+const submissions = { A: [], B: [] };
+
+function buildGrids() {
+  for (const [gridId, questions] of Object.entries(YSN_SECTIONS)) {
+    const grid = document.getElementById(gridId);
+    questions.forEach((q, i) => {
+      const key = `${gridId}-${i}`;
+      ysnState[key] = null;
+      const row = document.createElement('div');
+      row.className = 'ysn-row';
+      row.innerHTML = `
+        <span class="ysn-label">${q}</span>
+        <div class="ysn-btn-group"><button class="ysn-btn" onclick="setYSN('${key}','Yes',this)">Yes</button></div>
+        <div class="ysn-btn-group"><button class="ysn-btn" onclick="setYSN('${key}','Sometimes',this)">Sometimes</button></div>
+        <div class="ysn-btn-group"><button class="ysn-btn" onclick="setYSN('${key}','No',this)">No</button></div>`;
+      grid.appendChild(row);
+    });
+  }
+}
+
+function setYSN(key, val, btn) {
+  ysnState[key] = val;
+  btn.closest('.ysn-row').querySelectorAll('.ysn-btn').forEach(b => b.className = 'ysn-btn');
+  const cls = val === 'Yes' ? 'selected-yes' : val === 'Sometimes' ? 'selected-sometimes' : 'selected-no';
+  btn.classList.add(cls);
+}
+
+function getYSNData() {
+  const data = {};
+  for (const [gridId, questions] of Object.entries(YSN_SECTIONS)) {
+    questions.forEach((q, i) => { data[q] = ysnState[`${gridId}-${i}`] || '—'; });
+  }
+  return data;
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`panel-${tab}`).classList.add('active');
+  btn.classList.add('active');
+  if (tab === 'submissions') { renderSubmissions(); updateSheetLink(); }
+}
+
+function selectRadio(name, val, label) {
+  document.querySelectorAll(`[name="${name}"]`).forEach(r => r.closest('.radio-opt').classList.remove('selected-yes','selected-no'));
+  label.classList.add(val === 'Yes' ? 'selected-yes' : 'selected-no');
+}
+
+document.getElementById('b-impact-other').addEventListener('change', function() {
+  document.getElementById('b-impact-other-field').style.display = this.checked ? 'block' : 'none';
+});
+
+// ── SEND TO GOOGLE SHEET ──
+function sendToSheet(payload, statusEl, btnEl, onSuccess) {
+  if (!SCRIPT_URL) {
+    // No sheet connected — still allow local-only submission
+    setStatus(statusEl, 'success', '✓ Saved locally. Connect Google Sheets in the banner above to send to the SEN team automatically.');
+    btnEl.disabled = false;
+    onSuccess();
+    return;
+  }
+  setStatus(statusEl, 'sending', '⏳ Sending to Google Sheet...');
+  btnEl.disabled = true;
+
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    setStatus(statusEl, 'success', '✓ Submitted successfully — the SEN team can see this in the Google Sheet now.');
+    btnEl.disabled = false;
+    onSuccess();
+  }).catch(err => {
+    setStatus(statusEl, 'error', '⚠ Could not reach Google Sheet — submission saved locally. Please try again or contact IT.');
+    btnEl.disabled = false;
+    onSuccess(); // still save locally
+  });
+}
+
+function setStatus(el, type, msg) {
+  el.className = `submit-status ${type}`;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ── FORM A ──
+function submitFormA() {
+  const name    = document.getElementById('a-student-name').value.trim();
+  const teacher = document.getElementById('a-teacher-name').value.trim();
+  const subject = document.getElementById('a-subject').value.trim();
+  const year    = document.getElementById('a-year-group').value;
+  const date    = document.getElementById('a-date').value;
+  const struggles    = document.getElementById('a-struggles').value.trim();
+  const support      = document.getElementById('a-support').value.trim();
+  const whyTime      = document.getElementById('a-why-extra-time').value.trim();
+  const adjustments  = document.getElementById('a-adjustments').value.trim();
+  const usageComment = document.getElementById('a-usage-comment').value.trim();
+
+  if (!name||!teacher||!subject||!year||!date||!struggles||!support||!whyTime||!adjustments||!usageComment) {
+    alert('Please complete all required fields (marked *) before submitting.'); return;
+  }
+
+  const sub = {
+    form: 'A', timestamp: new Date().toLocaleString('en-GB'),
+    studentName: name, yearGroup: year, teacherName: teacher, subject, date,
+    struggles, support, ysn: getYSNData(),
+    overlayColour: document.getElementById('a-overlay-colour').value.trim(),
+    paperColour:   document.getElementById('a-paper-colour').value.trim(),
+    whyExtraTime: whyTime, adjustments, usageComment
+  };
+
+  sendToSheet(sub, document.getElementById('status-a'), document.getElementById('btn-submit-a'), () => {
+    submissions.A.push(sub);
+    showSuccessModal('A', sub);
+  });
+}
+
+// ── FORM B ──
+function submitFormB() {
+  const name    = document.getElementById('b-student-name').value.trim();
+  const subject = document.getElementById('b-subject').value.trim();
+  const examDate= document.getElementById('b-exam-date').value;
+  const teacher = document.getElementById('b-teacher-name').value.trim();
+  const usedTime= document.querySelector('[name="b-used-time"]:checked');
+  const comment = document.getElementById('b-teacher-comment').value.trim();
+
+  if (!name||!subject||!examDate||!teacher||!usedTime||!comment) {
+    alert('Please complete all required fields (marked *) before submitting.'); return;
+  }
+
+  const impacts = [];
+  if (document.getElementById('b-impact-1').checked) impacts.push('Completed more questions/sections');
+  if (document.getElementById('b-impact-2').checked) impacts.push('Improved or extended answers');
+  if (document.getElementById('b-impact-3').checked) impacts.push('Reviewed and corrected answers');
+  if (document.getElementById('b-impact-other').checked) impacts.push('Other: ' + document.getElementById('b-impact-other-text').value.trim());
+
+  const sub = {
+    form: 'B', timestamp: new Date().toLocaleString('en-GB'),
+    studentName: name, subject, examDate, teacherName: teacher,
+    usedExtraTime: usedTime.value, impacts,
+    teacherComment: comment,
+    studentComment: document.getElementById('b-student-comment').value.trim()
+  };
+
+  sendToSheet(sub, document.getElementById('status-b'), document.getElementById('btn-submit-b'), () => {
+    submissions.B.push(sub);
+    showSuccessModal('B', sub);
+  });
+}
+
+// ── MODALS ──
+function showSuccessModal(form, sub) {
+  document.getElementById('modal-title').textContent = `${form === 'A' ? 'Form A' : 'Form B'} — ${sub.studentName}`;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="alert-success">✓ Submitted for ${sub.studentName}${SCRIPT_URL ? ' — sent to Google Sheet' : ' — saved locally'}</div>
+    ${form === 'A' ? renderPreviewA(sub) : renderPreviewB(sub)}`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function renderPreviewA(sub) {
+  let html = '<div class="preview-card">';
+  html += `<div class="preview-block section-head">Student &amp; Staff Details</div><div class="preview-block">
+    <div class="preview-row"><span class="preview-key">Student</span><span>${sub.studentName}</span></div>
+    <div class="preview-row"><span class="preview-key">Year Group</span><span>${sub.yearGroup}</span></div>
+    <div class="preview-row"><span class="preview-key">Teacher</span><span>${sub.teacherName}</span></div>
+    <div class="preview-row"><span class="preview-key">Subject</span><span>${sub.subject}</span></div>
+    <div class="preview-row"><span class="preview-key">Date</span><span>${sub.date}</span></div></div>`;
+  html += `<div class="preview-block section-head">Difficulties &amp; Support</div><div class="preview-block">
+    <div class="preview-row"><span class="preview-key">Struggles</span><span>${sub.struggles}</span></div>
+    <div class="preview-row"><span class="preview-key">Support</span><span>${sub.support}</span></div></div>`;
+  html += `<div class="preview-block section-head">Checklist</div><div class="preview-block">`;
+  for (const [q, v] of Object.entries(sub.ysn)) {
+    const cls = v==='Yes'?'badge-yes':v==='Sometimes'?'badge-sometimes':v==='No'?'badge-no':'';
+    html += `<div class="preview-row" style="margin-bottom:4px"><span class="preview-key" style="font-size:11px">${q}</span><span><span class="badge ${cls}">${v}</span></span></div>`;
+  }
+  html += `</div>`;
+  html += `<div class="preview-block section-head">Observations</div><div class="preview-block">
+    <div class="preview-row"><span class="preview-key">Why extra time</span><span>${sub.whyExtraTime}</span></div>
+    <div class="preview-row" style="margin-top:6px"><span class="preview-key">Adjustments</span><span>${sub.adjustments}</span></div>
+    <div class="preview-row" style="margin-top:6px"><span class="preview-key">Use of time</span><span>${sub.usageComment}</span></div></div>`;
+  html += `<div class="preview-block" style="color:var(--grey-400);font-size:11px">Submitted: ${sub.timestamp}</div></div>`;
+  return html;
+}
+
+function renderPreviewB(sub) {
+  return `<div class="preview-card">
+    <div class="preview-block section-head">Exam Details</div>
+    <div class="preview-block">
+      <div class="preview-row"><span class="preview-key">Student</span><span>${sub.studentName}</span></div>
+      <div class="preview-row"><span class="preview-key">Subject</span><span>${sub.subject}</span></div>
+      <div class="preview-row"><span class="preview-key">Exam date</span><span>${sub.examDate}</span></div>
+      <div class="preview-row"><span class="preview-key">Teacher</span><span>${sub.teacherName}</span></div>
+    </div>
+    <div class="preview-block section-head">Extra Time</div>
+    <div class="preview-block">
+      <div class="preview-row"><span class="preview-key">Used extra time?</span><span class="badge ${sub.usedExtraTime==='Yes'?'badge-yes':'badge-no'}">${sub.usedExtraTime}</span></div>
+      <div class="preview-row" style="margin-top:6px"><span class="preview-key">Impact</span><span>${sub.impacts.join('; ')||'None recorded'}</span></div>
+    </div>
+    <div class="preview-block section-head">Comments</div>
+    <div class="preview-block">
+      <div class="preview-row"><span class="preview-key">Teacher comment</span><span>${sub.teacherComment}</span></div>
+      ${sub.studentComment?`<div class="preview-row" style="margin-top:6px"><span class="preview-key">Student comment</span><span>${sub.studentComment}</span></div>`:''}
+    </div>
+    <div class="preview-block" style="color:var(--grey-400);font-size:11px">Submitted: ${sub.timestamp}</div>
+  </div>`;
+}
+
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+function renderSubmissions() {
+  ['A','B'].forEach(f => {
+    const el = document.getElementById(`subs-${f.toLowerCase()}`);
+    const subs = submissions[f];
+    if (!subs.length) { el.innerHTML = '<div class="empty-state">No submissions this session.</div>'; return; }
+    el.innerHTML = subs.map((s,i) => `
+      <div class="sub-item">
+        <strong>${s.studentName}</strong>
+        <span>${s.subject||''}</span>
+        <span class="sub-meta">${s.timestamp}</span>
+        <button class="btn-view-sub" onclick="viewSub('${f}',${i})">View</button>
+      </div>`).join('');
+  });
+}
+
+function viewSub(form, idx) {
+  const sub = submissions[form][idx];
+  document.getElementById('modal-title').textContent = `${form === 'A' ? 'Form A' : 'Form B'} — ${sub.studentName}`;
+  document.getElementById('modal-body').innerHTML = form === 'A' ? renderPreviewA(sub) : renderPreviewB(sub);
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function clearFormA() {
+  if (!confirm('Clear all fields in Form A?')) return;
+  ['a-student-name','a-year-group','a-date','a-teacher-name','a-subject',
+   'a-struggles','a-support','a-overlay-colour','a-paper-colour',
+   'a-why-extra-time','a-adjustments','a-usage-comment'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.querySelectorAll('.ysn-btn').forEach(b => b.className = 'ysn-btn');
+  Object.keys(ysnState).forEach(k => ysnState[k] = null);
+  document.getElementById('status-a').style.display = 'none';
+}
+
+function clearFormB() {
+  if (!confirm('Clear all fields in Form B?')) return;
+  ['b-student-name','b-subject','b-exam-date','b-teacher-name',
+   'b-teacher-comment','b-student-comment','b-impact-other-text'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.querySelectorAll('[name="b-used-time"]').forEach(r => r.checked = false);
+  document.querySelectorAll('#b-used-time-group .radio-opt').forEach(l => l.classList.remove('selected-yes','selected-no'));
+  ['b-impact-1','b-impact-2','b-impact-3','b-impact-other'].forEach(id => document.getElementById(id).checked = false);
+  document.getElementById('b-impact-other-field').style.display = 'none';
+  document.getElementById('status-b').style.display = 'none';
+}
+
+// ── INIT ──
+buildGrids();
+updateConfigBanner();
+updateSheetLink();
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('a-date').value = today;
+document.getElementById('b-exam-date').value = today;
+if (SCRIPT_URL) document.getElementById('script-url-input').value = SCRIPT_URL;
+</script>
+</body>
+</html>
